@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  nginxpmcontrol:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      # Mount the .env file from the host to the root directory of the container
+      - .env:/.env
+    environment:
+      # Optionally, you can define environment variables here
+      # Example: ENV_VAR_NAME=value
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
