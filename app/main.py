@@ -250,7 +250,7 @@ def main():
     """
     Main function to run the Streamlit app.
     """
-    load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
+    load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
     api_url = os.getenv("NPM_API_URL")
     identity = os.getenv("NPM_IDENTITY")
     secret = os.getenv("NPM_SECRET")
