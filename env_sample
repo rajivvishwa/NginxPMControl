@@ -1,0 +1,11 @@
+NPM_API_URL=http://localhost:81
+NPM_IDENTITY=abc@email.com
+NPM_SECRET=sup3rs3cr3t
+
+DEFAULT_DOMAIN=*.zzz.home
+
+# Proxy host creation defaults
+DEFAULT_HOST=zzz.local
+
+# Glances servers
+GLANCES_SERVERS="xyz.local,zzz.local, abc.local"

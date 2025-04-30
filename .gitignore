@@ -1,0 +1,8 @@
+#gitignore file ignore everything inside archive folder, .env file, and .DS_Store
+archive/
+.env
+.DS_Store
+__pycache__/
+uv.lock
+.venv/
+Dockerfile
