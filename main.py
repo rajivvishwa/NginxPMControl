@@ -268,7 +268,7 @@ def main():
 
     st.set_page_config(layout="wide")
 
-    st.title("Proxy Hosts")
+    st.title("NGINX Proxy Manager Control")
 
     proxy_hosts = npm_ph.getProxyHosts(api_url, bearer_token)
     certificates = npm_ph.getCertificatesList(api_url, bearer_token)
