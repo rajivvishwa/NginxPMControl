@@ -5,3 +5,4 @@ archive/
 __pycache__/
 uv.lock
 .venv/
+local/
