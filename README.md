@@ -75,17 +75,17 @@ NginxPMControl is a Python-based application that interacts with the Nginx Proxy
 
 Here are some screenshots of the application:
 
-### Dashboard
-![Dashboard](images/dashboard.png)
+### List Proxy Hosts
+![List Proxy Hosts](images/ListProxyHosts.png)
 
-### Proxy Host Management
-![Proxy Host Management](images/proxy_host_management.png)
+### Check Used/Free Ports
+![Free and Used Ports Check](images/CheckUsedFreePorts.png)
 
-### Certificate Management
-![Certificate Management](images/certificate_management.png)
+### Create New Proxy Host
+![Create New Proxy Host](images/CreateNewProxyHost.png)
 
-### Container Data
-![Container Data](images/container_data.png)
+### Containers List (from Glances)
+![Container List](images/GlancesContainerList.png)
 
 ## Project Structure
 
