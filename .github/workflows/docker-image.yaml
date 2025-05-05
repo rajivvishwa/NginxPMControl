@@ -21,4 +21,4 @@ jobs:
       with:
         platforms: linux/amd64,linux/arm64
         push: true
-        tags: ${{ vars.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:latest
+        tags: ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_HUB_PROJECT_NAME }}:latest
