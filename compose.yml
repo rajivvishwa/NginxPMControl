@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  nginxpmcontrol:
+    image: rajivvishwa/nginxpmcontrol:latest
+    ports:
+      - "8501:8501"
+    volumes:
+      # Mount the .env file from the host to the root directory of the container
+      - .env:/.env
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
