@@ -189,6 +189,7 @@ def displaySetProxyHosts(api_url, bearer_token, DEFAULT_DOMAIN, DEFAULT_HOST, ce
         certificate_id = certificate_name[selected_cert]
         st.divider()
         ssl_forced = st.checkbox("SSL Forced", value=True)
+        allow_websocket_upgrade = st.checkbox("Web Sockets Support", value=True)
         block_exploits = st.checkbox("Block Exploits", value=True)
         http2_support = st.checkbox("HTTP/2 Support")
         caching_enabled = st.checkbox("Caching Enabled", value=True)
@@ -203,6 +204,7 @@ def displaySetProxyHosts(api_url, bearer_token, DEFAULT_DOMAIN, DEFAULT_HOST, ce
         "block_exploits": block_exploits,
         "http2_support": http2_support,
         "caching_enabled": caching_enabled,
+        "allow_websocket_upgrade": allow_websocket_upgrade,
         "hsts_enabled": False,
         "hsts_subdomains": False,
         "access_list_id": 0,
