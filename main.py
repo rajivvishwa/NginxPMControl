@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from ngnixpm_auth import get_valid_token
 from glances_api import get_container_data
 from pihole_api_dns import get_cnames
+from pihole_api_dns import put_cnames
 import ngnixpm_proxyhosts as npm_ph
 
 def find_free_port(port_range, sorted_df, range_size=100):
@@ -253,15 +254,24 @@ def displayPiHoleCnames(pihole_server):
     """
     Display Pi-hole CNAME records in a Streamlit app.
     """
+    # add a button to refresh the data
+    if st.button("Refresh CNAME Records"):
+        st.experimental_rerun()
+
     cnames_df = get_cnames(pihole_server)
 
     target_selection = sorted(cnames_df['target'].dropna().unique().tolist())
-    selected_target= st.radio("Cname Target Server:", target_selection, horizontal=True)
+    selected_target = st.radio("Choose Target Server:", target_selection, horizontal=True)
 
     # Filter the DataFrame based on the selected target
     filtered_hosts = sorted(
         cnames_df[cnames_df['target'] == selected_target]['host'].dropna().unique().tolist()
     ) if selected_target else sorted(cnames_df['host'].dropna().unique().tolist())
+
+    # Add a text input for partial search
+    search_query = st.text_input("Filter Hosts", value="")
+    if search_query:
+        filtered_hosts = [host for host in filtered_hosts if search_query.lower() in host.lower()]
 
     selected_hosts = st.multiselect("Select Hosts:", filtered_hosts)
 
@@ -282,9 +292,43 @@ def displayPiHoleCnames(pihole_server):
     )
     return filtered_df
 
+def displayAddPiholeCname(pihole_server, host, target):
+    """
+    Add a CNAME record to the Pi-hole server.
+    """
+    response = {}
+
+    st.write("Add CNAME Record")
+    
+    
+    cnames_df = get_cnames(pihole_server)
+
+    target_selection = sorted(cnames_df['target'].dropna().unique().tolist())
+
+    target = st.selectbox("Target", options=target_selection)
+
+    placeholder_host = "***." + target.split(".")[0] + ".home"
+    host = st.text_input("Host", value=placeholder_host)
+
+    if host in cnames_df['host'].values:
+        st.error(f"Host {host} already exists. Please choose a different host.")
+        return
+
+    # Add a button to trigger the CNAME record addition
+    if st.button("Add CNAME Record", type="primary"):
+        if target and host:
+            st.info(f"Adding CNAME record: {host} -> {target}")
+            response = put_cnames(pihole_server, host, target)
+        else:
+            st.error("Please provide both host and target values.")
+        
+        if "config" not in response.json() and "error" not in response.json():
+            st.success(f"CNAME record updated successfully. Reponse : {response.json()}")
+        else:
+            st.error(f"Failed to update CNAME record: {response.json()}")
 
 
-
+    
 def main():
     """
     Main function to run the Streamlit app.
@@ -320,9 +364,9 @@ def main():
     else:
         st.error("Failed to retrieve proxy hosts or certificates.")
 
-    tab1, tab2, tab3, tab4, tab5 = \
+    tab1, tab2, tab3, tab4, tab5, tab6= \
         st.tabs(["Proxy Hosts", "Free Port", "Set Proxy Host", \
-                 "Glances Container Data", "Pi-hole CNAME Records"])
+                 "Glances Container Data", "Pi-hole CNAME Records", "Add CNAME Record"])
     
     with tab1:
         st.markdown("### NGINX Proxy Hosts")
@@ -339,6 +383,9 @@ def main():
     with tab5:
         st.markdown("### Pi-hole CNAME Records")
         displayPiHoleCnames(pihole_server)
+    with tab6:
+        st.markdown("### Add CNAME Record")
+        displayAddPiholeCname(pihole_server, "test7.astra.home", "astra.infv")
 
 
 if __name__ == "__main__":

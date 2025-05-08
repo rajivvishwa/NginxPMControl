@@ -50,6 +50,44 @@ def get_cnames(pihole_server):
 
     return cnames_df  
 
+def put_cnames(pihole_server, host, target):
+    """
+    Updates CNAME records on the Pi-hole server.
+    """
+    get_valid_token()
+    sid, csrf = get_token_keyring()
+
+    if not sid or not csrf:
+        logging.error("Failed to retrieve session ID or CSRF token from keyring.")
+        return
+    
+    #test.astra.home%2Castra.infv
+    logging.info(f"Host: {host}")
+    logging.info(f"Target: {target}")
+
+    url = f'https://{pihole_server}/api/config/dns/cnameRecords/{host}%2C{target}'
+    logging.info(f"Sending PUT request to {url}")
+
+    payload = {}
+
+    headers = {
+    "X-FTL-SID": sid,
+    "X-FTL-CSRF": csrf
+    }
+
+    response = requests.put(url, headers=headers, data=payload, verify=False)
+
+    logging.info(f"Response: {response.json()} and Response code: {response.status_code}")
+
+    # if response.json()["config"] is empty, then cname record is not. if config is not returned, then cname was updated
+
+    if "config" not in response.json() and "error" not in response.json():
+        logging.info("CNAME record updated successfully.")
+    else:
+        logging.error(f"Failed to update CNAME record: {response.json()}")
+    
+    return response
+
 def main():
     """
     Main function to execute the script.
@@ -76,7 +114,7 @@ def main():
     logging.info(f"Session ID: {sid}")
     logging.info(f"CSRF Token: {csrf}")
     # Fetch CNAME records
-    cnames_df = get_cnames()
+    cnames_df = get_cnames(pihole_server)
 
     logging.info("CNAME Records:")
     logging.info(cnames_df)
@@ -87,6 +125,7 @@ def main():
 
     st.dataframe(cnames_df)
 
+    put_cnames(pihole_server, "test4.astra.home", "astra.infv")
 
 if __name__ == "__main__":
    main()
