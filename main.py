@@ -388,7 +388,11 @@ def main():
         print("Failed to retrieve a valid token.")
         return
 
-    st.set_page_config(layout="wide")
+    PAGE_CONFIG = {"page_title":"NGINX Proxy Manager Control", 
+                   "page_icon":"🛠️",
+                   "layout":"wide"}
+    st.set_page_config(**PAGE_CONFIG)
+
 
     st.title("NGINX Proxy Manager Control")
 
