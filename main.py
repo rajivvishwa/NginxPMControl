@@ -267,6 +267,13 @@ def displayPiHoleCnames(pihole_server, DEFAULT_HOST):
 
     target_selection = sorted(cnames_df['target'].dropna().unique().tolist())
 
+    hosts = sorted(cnames_df['host'].dropna().unique().tolist())
+
+    # append url to cnames_df['host']
+    cnames_df['url'] = cnames_df['host'].apply(lambda x: f"https://{x}")
+
+    # Add a radio button for target selection
+
     # find the index of the default domain in the target_selection list, if not found, set to 0
     try:
         default_domain_index = target_selection.index(DEFAULT_HOST)
@@ -302,6 +309,9 @@ def displayPiHoleCnames(pihole_server, DEFAULT_HOST):
 
     st.dataframe(
         filtered_df,
+        column_config={
+            "url": st.column_config.LinkColumn("Url"),
+        },
         height=35*len(filtered_df)+38
     )
     return filtered_df
