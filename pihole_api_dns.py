@@ -19,10 +19,17 @@ pihole_server = None
 sid = None
 csrf = None
 
-def get_cnames():
+def get_cnames(pihole_server):
     """
     Fetches CNAME records from the Pi-hole server.
     """
+    get_valid_token()
+    sid, csrf = get_token_keyring()
+
+    if not sid or not csrf:
+        logging.error("Failed to retrieve session ID or CSRF token from keyring.")
+        return
+
     url = f'https://{pihole_server}/api/config/dns/cnameRecords'
 
     payload = {}

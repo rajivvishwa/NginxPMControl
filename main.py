@@ -5,6 +5,7 @@ import json
 from dotenv import load_dotenv
 from ngnixpm_auth import get_valid_token
 from glances_api import get_container_data
+from pihole_api_dns import get_cnames
 import ngnixpm_proxyhosts as npm_ph
 
 def find_free_port(port_range, sorted_df, range_size=100):
@@ -248,6 +249,42 @@ def displayGlancesContainerData(glances_servers):
     else:
         st.error("No container data available for the selected server.")
 
+def displayPiHoleCnames(pihole_server):
+    """
+    Display Pi-hole CNAME records in a Streamlit app.
+    """
+    cnames_df = get_cnames(pihole_server)
+
+    target_selection = sorted(cnames_df['target'].dropna().unique().tolist())
+    selected_target= st.radio("Cname Target Server:", target_selection, horizontal=True)
+
+    # Filter the DataFrame based on the selected target
+    filtered_hosts = sorted(
+        cnames_df[cnames_df['target'] == selected_target]['host'].dropna().unique().tolist()
+    ) if selected_target else sorted(cnames_df['host'].dropna().unique().tolist())
+
+    selected_hosts = st.multiselect("Select Hosts:", filtered_hosts)
+
+    selection_df = pd.DataFrame(
+        {
+            "Target Selection": selected_target,
+            "Host Selection": selected_hosts
+        }
+    )
+
+    filtered_df = cnames_df[cnames_df['target'] == selected_target] if selected_target else cnames_df
+    if selected_hosts:
+        filtered_df = filtered_df[filtered_df['host'].isin(selected_hosts)]
+
+    st.dataframe(
+        filtered_df,
+        height=35*len(filtered_df)+38
+    )
+    return filtered_df
+
+
+
+
 def main():
     """
     Main function to run the Streamlit app.
@@ -259,6 +296,8 @@ def main():
     default_domain = os.getenv("DEFAULT_DOMAIN")
     default_host = os.getenv("DEFAULT_HOST")
     glances_servers = os.getenv("GLANCES_SERVERS")
+    pihole_server = os.getenv("PIHOLE_SERVER")
+    pihole_password = os.getenv("PIHOLE_PASSWORD")
 
     if not api_url or not identity or not secret or not default_domain:
         raise ValueError("NPM_API_URL, NPM_IDENTITY, or NPM_SECRET, DEFAULT_DOMAIN environment variables are not set")
@@ -281,7 +320,10 @@ def main():
     else:
         st.error("Failed to retrieve proxy hosts or certificates.")
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Proxy Hosts", "Free Port", "Set Proxy Host", "Glances Container Data"])
+    tab1, tab2, tab3, tab4, tab5 = \
+        st.tabs(["Proxy Hosts", "Free Port", "Set Proxy Host", \
+                 "Glances Container Data", "Pi-hole CNAME Records"])
+    
     with tab1:
         st.markdown("### NGINX Proxy Hosts")
         filtered_df = displayProxyHosts(proxy_hosts, default_domain)
@@ -294,6 +336,9 @@ def main():
     with tab4:
         st.markdown("### Glances Container Data")
         displayGlancesContainerData(glances_servers)
+    with tab5:
+        st.markdown("### Pi-hole CNAME Records")
+        displayPiHoleCnames(pihole_server)
 
 
 if __name__ == "__main__":

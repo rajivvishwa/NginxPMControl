@@ -90,6 +90,10 @@ def get_valid_token():
         put_token_keyring(token)
     else:
         logging.info("Checking if the token is valid...")
+        logging.info(f"Session ID: {sid}")
+        logging.info(f"CSRF Token: {csrf}")
+
+        # Check if the token is valid
         url = f'https://{pihole_server}/api/auth'
         payload = {}
         headers = {
@@ -103,7 +107,6 @@ def get_valid_token():
         # Send POST request to authenticate
         try:
             response = requests.request("GET", url, headers=headers, data=payload, verify=False)
-            response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
             token = response.json()
             if token['session']['valid'] == True:
                 logging.info("Token in keyring is valid.")
