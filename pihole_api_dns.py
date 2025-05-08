@@ -33,8 +33,6 @@ def get_cnames():
 
     response = requests.request("GET", url, headers=headers, data=payload, verify=False)
 
-    print(response.text)
-
     records = response.json()["config"]["dns"]["cnameRecords"]
 
     # Split each record into host and target
@@ -73,7 +71,15 @@ def main():
     # Fetch CNAME records
     cnames_df = get_cnames()
 
+    logging.info("CNAME Records:")
+    logging.info(cnames_df)
+
+    # Display the DataFrame in Streamlit
+    st.title("Pi-hole CNAME Records")
+    st.write("CNAME records fetched from the Pi-hole server:")
+
     st.dataframe(cnames_df)
+
 
 if __name__ == "__main__":
    main()
