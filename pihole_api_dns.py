@@ -8,8 +8,6 @@ from keyring.errors import PasswordDeleteError
 from pihole_auth import get_valid_token
 from pihole_auth import get_token_keyring
 import streamlit as st
-from rich.console import Console
-from rich.table import Table
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

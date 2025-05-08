@@ -9,6 +9,7 @@ from pihole_api_dns import get_cnames
 from pihole_api_dns import put_cnames
 import ngnixpm_proxyhosts as npm_ph
 
+
 def find_free_port(port_range, sorted_df, range_size=100):
     """
     Find a free port starting with port_range itself. If port_range is used,
@@ -186,7 +187,11 @@ def displaySetProxyHosts(api_url, bearer_token, DEFAULT_DOMAIN, DEFAULT_HOST, ce
         st.write("SSL Settings")
         certificate_name = {cert['nice_name']: cert['id'] for cert in certificates}
         # Create a radio button using the nice_name as labels
-        selected_cert = st.radio("Select a certificate:", list(certificate_name.keys()), horizontal=False)
+        
+        # find the index of the default domain in the certificate_name keys
+        default_domain_index = list(certificate_name.keys()).index(DEFAULT_DOMAIN)
+
+        selected_cert = st.radio("Select a certificate:", list(certificate_name.keys()), index=default_domain_index, horizontal=False)
         # Get the corresponding id
         certificate_id = certificate_name[selected_cert]
         st.divider()
@@ -250,7 +255,7 @@ def displayGlancesContainerData(glances_servers):
     else:
         st.error("No container data available for the selected server.")
 
-def displayPiHoleCnames(pihole_server):
+def displayPiHoleCnames(pihole_server, DEFAULT_HOST):
     """
     Display Pi-hole CNAME records in a Streamlit app.
     """
@@ -261,7 +266,16 @@ def displayPiHoleCnames(pihole_server):
     cnames_df = get_cnames(pihole_server)
 
     target_selection = sorted(cnames_df['target'].dropna().unique().tolist())
-    selected_target = st.radio("Choose Target Server:", target_selection, horizontal=True)
+
+    # find the index of the default domain in the target_selection list, if not found, set to 0
+    try:
+        default_domain_index = target_selection.index(DEFAULT_HOST)
+    except ValueError:
+        # If the default domain is not found, set to 0
+        default_domain_index = 0
+    default_domain_index = target_selection.index(DEFAULT_HOST)
+
+    selected_target = st.radio("Choose Target Server:", target_selection, index=default_domain_index, horizontal=True)
 
     # Filter the DataFrame based on the selected target
     filtered_hosts = sorted(
@@ -292,7 +306,7 @@ def displayPiHoleCnames(pihole_server):
     )
     return filtered_df
 
-def displayAddPiholeCname(pihole_server, host, target):
+def displayAddPiholeCname(pihole_server, DEFAULT_HOST):
     """
     Add a CNAME record to the Pi-hole server.
     """
@@ -305,7 +319,15 @@ def displayAddPiholeCname(pihole_server, host, target):
 
     target_selection = sorted(cnames_df['target'].dropna().unique().tolist())
 
-    target = st.selectbox("Target", options=target_selection)
+
+    try:
+        default_domain_index = target_selection.index(DEFAULT_HOST)
+    except ValueError:
+        # If the default domain is not found, set to 0
+        default_domain_index = 0
+    default_domain_index = target_selection.index(DEFAULT_HOST)
+
+    target = st.selectbox("Select Target", options=target_selection, index=default_domain_index)
 
     placeholder_host = "***." + target.split(".")[0] + ".home"
     host = st.text_input("Host", value=placeholder_host)
@@ -382,10 +404,10 @@ def main():
         displayGlancesContainerData(glances_servers)
     with tab5:
         st.markdown("### Pi-hole CNAME Records")
-        displayPiHoleCnames(pihole_server)
+        displayPiHoleCnames(pihole_server, default_host)
     with tab6:
         st.markdown("### Add CNAME Record")
-        displayAddPiholeCname(pihole_server, "test7.astra.home", "astra.infv")
+        displayAddPiholeCname(pihole_server, default_host)
 
 
 if __name__ == "__main__":
