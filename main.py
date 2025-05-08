@@ -289,13 +289,18 @@ def displayPiHoleCnames(pihole_server, DEFAULT_HOST):
         cnames_df[cnames_df['target'] == selected_target]['host'].dropna().unique().tolist()
     ) if selected_target else sorted(cnames_df['host'].dropna().unique().tolist())
 
-    # Add a text input for partial search
-    search_query = st.text_input("Filter Hosts", value="")
-    if search_query:
-        filtered_hosts = [host for host in filtered_hosts if search_query.lower() in host.lower()]
 
-    selected_hosts = st.multiselect("Select Hosts:", filtered_hosts)
+    col1, col2 = st.columns(2)
+    with col1:
+        # Add a text input for partial search
+        search_query = st.text_input("Filter Hosts", value="")
+        if search_query:
+            filtered_hosts = [host for host in filtered_hosts if search_query.lower() in host.lower()]
 
+    with col2:
+        selected_hosts = st.multiselect("Select Hosts:", filtered_hosts)
+
+    st.markdown("#### CNAME Records")
     selection_df = pd.DataFrame(
         {
             "Target Selection": selected_target,
