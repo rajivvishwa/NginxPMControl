@@ -360,7 +360,7 @@ def displayAddPiholeCname(pihole_server, DEFAULT_HOST):
             st.error("Please provide both host and target values.")
         
         if "config" not in response.json() and "error" not in response.json():
-            st.success(f"CNAME record updated successfully. Reponse : {response.json()}")
+            st.success(f"CNAME record updated successfully. [{host}](https://{host}), Reponse : {response.json()}")
         else:
             st.error(f"Failed to update CNAME record: {response.json()}")
 
