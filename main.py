@@ -395,7 +395,6 @@ def main():
 
 
     st.title("NGINX Proxy Manager Control")
-    st.badge("New")
 
     proxy_hosts = npm_ph.getProxyHosts(api_url, bearer_token)
     certificates = npm_ph.getCertificatesList(api_url, bearer_token)
